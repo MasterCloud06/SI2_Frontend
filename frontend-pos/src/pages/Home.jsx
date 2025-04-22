@@ -65,6 +65,7 @@ function Home() {
               <a href="#ai-features" className="hover:text-gray-300">IA</a>
               <a href="#pricing" className="hover:text-gray-300">Precios</a>
               <a href="#support" className="hover:text-gray-300">Soporte</a>
+              <a href="#support" className="hover:text-gray-300">Soporte2fg</a>
             </div>
             <div className="flex space-x-4">
               {!loggedIn ? (
