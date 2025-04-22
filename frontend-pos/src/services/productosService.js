@@ -1,56 +1,10 @@
 // src/services/productosService.js
-import api from './api';
+import api from '../lib/axios';
 
-export const getProducts = async () => {
-  try {
-    const response = await api.get('/productos/');
-    return response.data;
-  } catch (error) {
-    throw error;
-  }
-};
-
-export const getProductById = async (id) => {
-  try {
-    const response = await api.get(`/productos/${id}/`);
-    return response.data;
-  } catch (error) {
-    throw error;
-  }
-};
-
-export const createProduct = async (data) => {
-  try {
-    const response = await api.post('/productos/', data);
-    return response.data;
-  } catch (error) {
-    throw error;
-  }
-};
-
-export const updateProduct = async (id, data) => {
-  try {
-    const response = await api.put(`/productos/${id}/`, data);
-    return response.data;
-  } catch (error) {
-    throw error;
-  }
-};
-
-export const deleteProduct = async (id) => {
-  try {
-    const response = await api.delete(`/productos/${id}/`);
-    return response.data;
-  } catch (error) {
-    throw error;
-  }
-};
-
-export const reduceStock = async (id, amount) => {
-  try {
-    const response = await api.post(`/productos/${id}/reduce_stock/`, { amount });
-    return response.data;
-  } catch (error) {
-    throw error;
-  }
-};
+export const getProducts = () => api.get('/productos/').then(res => res.data);
+export const getProductById = (id) => api.get(`/productos/${id}/`).then(res => res.data);
+export const createProduct = (data) => api.post('/productos/', data).then(res => res.data);
+export const updateProduct = (id, data) => api.put(`/productos/${id}/`, data).then(res => res.data);
+export const deleteProduct = (id) => api.delete(`/productos/${id}/`).then(res => res.data);
+export const reduceStock = (id, amount) =>
+  api.post(`/productos/${id}/reduce_stock/`, { amount }).then(res => res.data);

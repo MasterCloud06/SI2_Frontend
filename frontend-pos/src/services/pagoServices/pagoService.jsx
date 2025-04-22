@@ -1,6 +1,9 @@
 // src/services/pagoService.jsx
-import axios from 'axios';
+import api from '../lib/axios';
 
 export const realizarPago = (total, tarjetaInfo) => {
-  return axios.post('/api/pago', { tarjeta_info: tarjetaInfo });
+  return api.post('/pago/', {
+    total,
+    tarjeta_info: tarjetaInfo,
+  });
 };

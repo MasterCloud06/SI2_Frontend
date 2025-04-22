@@ -1,7 +1,7 @@
 // src/pages/reportes/ReporteList.jsx
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
 import { Link } from 'react-router-dom';
+import api from '../../lib/axios';
 
 function ReporteList() {
   const [reportes, setReportes] = useState([]);
@@ -10,11 +10,10 @@ function ReporteList() {
   useEffect(() => {
     const fetchReportes = async () => {
       try {
-        const response = await axios.get('http://localhost:8000/api/reportes/');
+        const response = await api.get('/reportes/');
         setReportes(response.data);
       } catch (err) {
         setError('Error al cargar los reportes');
-        console.error(err);
       }
     };
 

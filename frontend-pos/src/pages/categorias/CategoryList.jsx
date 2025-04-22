@@ -1,13 +1,24 @@
+// src/pages/categorias/CategoryList.jsx
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
 import { Link, useNavigate } from 'react-router-dom';
 import { FaEdit, FaTrashAlt, FaPlus } from 'react-icons/fa';
+import api from '../../lib/axios';
 
-// Reutilizar o crear componentes auxiliares
-function LoadingSpinner() { /* ... */ }
-function ErrorDisplay({ message }) { /* ... */ }
-function ConfirmationDialog({ message, onConfirm, onCancel }) { /* ... */ }
-
+function LoadingSpinner() { return <div className="p-6">Cargando...</div>; }
+function ErrorDisplay({ message }) { return <div className="p-6 text-red-600">{message}</div>; }
+function ConfirmationDialog({ message, onConfirm, onCancel }) {
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
+      <div className="bg-white p-6 rounded shadow-md w-80">
+        <p className="mb-4">{message}</p>
+        <div className="flex justify-end space-x-3">
+          <button onClick={onCancel} className="bg-gray-300 px-3 py-1 rounded">Cancelar</button>
+          <button onClick={onConfirm} className="bg-red-500 text-white px-3 py-1 rounded">Confirmar</button>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 function CategoryList() {
   const [categories, setCategories] = useState([]);
@@ -17,119 +28,89 @@ function CategoryList() {
   const [categoryToDelete, setCategoryToDelete] = useState(null);
   const navigate = useNavigate();
 
-  const API_URL = 'http://localhost:8000/api/categorias/';
-
   const fetchCategories = async () => {
-      setLoading(true);
-      setError('');
-      try {
-          const response = await axios.get(API_URL);
-           // Asumiendo respuesta directa de array o con 'results'
-           if (Array.isArray(response.data)) {
-              setCategories(response.data);
-          } else if (response.data && Array.isArray(response.data.results)) {
-              setCategories(response.data.results);
-          } else {
-              console.warn("Respuesta inesperada:", response.data);
-              setCategories([]);
-              setError('Formato de respuesta inesperado.');
-          }
-      } catch (err) {
-          setError('Error al cargar categorías.');
-          console.error("Error fetching categories:", err);
-      } finally {
-          setLoading(false);
-      }
+    setLoading(true);
+    try {
+      const res = await api.get('/categorias/');
+      setCategories(Array.isArray(res.data) ? res.data : res.data.results || []);
+    } catch (err) {
+      setError('Error al cargar categorías.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
-      fetchCategories();
+    fetchCategories();
   }, []);
 
   const handleDeleteClick = (category) => {
-      setCategoryToDelete(category);
-      setShowConfirmDialog(true);
+    setCategoryToDelete(category);
+    setShowConfirmDialog(true);
   };
 
   const confirmDelete = async () => {
-      if (!categoryToDelete) return;
-      try {
-          // Opcional: Verificar si hay productos asociados antes de borrar,
-          // o confiar en la restricción ON DELETE SET NULL de la BD.
-          await axios.delete(`<span class="math-inline">\{API\_URL\}</span>{categoryToDelete.id}/`);
-          fetchCategories(); // Recargar lista
-      } catch (err) {
-          setError(`Error al eliminar la categoría ${categoryToDelete.name}`);
-          console.error("Error deleting category:", err);
-      } finally {
-          setShowConfirmDialog(false);
-          setCategoryToDelete(null);
-      }
-  };
-
-   const cancelDelete = () => {
+    try {
+      await api.delete(`/categorias/${categoryToDelete.id}/`);
+      fetchCategories();
+    } catch (err) {
+      setError(`Error al eliminar la categoría: ${categoryToDelete.name}`);
+    } finally {
       setShowConfirmDialog(false);
       setCategoryToDelete(null);
+    }
   };
 
-
   return (
-      <div className="p-4 md:p-6 max-w-4xl mx-auto bg-white dark:bg-gray-800 shadow-lg rounded-lg">
-          {showConfirmDialog && categoryToDelete && (
-              <ConfirmationDialog 
-                  message={`¿Estás seguro de eliminar la categoría "${categoryToDelete.name}"? Los productos asociados quedarán sin categoría.`}
-                  onConfirm={confirmDelete}
-                  onCancel={cancelDelete}
-              />
-          )}
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
-              <h1 className="text-xl md:text-3xl font-semibold text-gray-800 dark:text-gray-100">Gestión de Categorías</h1>
-              <Link 
-                  to="/categorias/create" // Asume ruta de creación
-                  className="flex items-center bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition duration-150 ease-in-out text-sm"
-              >
-                  <FaPlus className="mr-2"/> Añadir Categoría
-              </Link>
-          </div>
+    <div className="p-6 max-w-4xl mx-auto bg-white shadow rounded">
+      {showConfirmDialog && (
+        <ConfirmationDialog
+          message={`¿Eliminar la categoría "${categoryToDelete.name}"?`}
+          onConfirm={confirmDelete}
+          onCancel={() => setShowConfirmDialog(false)}
+        />
+      )}
 
-          {error && <ErrorDisplay message={error} />}
-
-          {loading ? (
-              <LoadingSpinner />
-          ) : (
-              <div className="overflow-x-auto relative shadow-md sm:rounded-lg">
-                  <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
-                      <thead className="text-xs text-gray-700 uppercase bg-gray-100 dark:bg-gray-700 dark:text-gray-300">
-                          <tr>
-                              <th scope="col" className="px-6 py-3">ID</th>
-                              <th scope="col" className="px-6 py-3">Nombre</th>
-                              <th scope="col" className="px-6 py-3">Descripción</th>
-                              <th scope="col" className="px-6 py-3 text-center">Acciones</th>
-                          </tr>
-                      </thead>
-                      <tbody>
-                          {categories.length > 0 ? (
-                              categories.map((category) => (
-                                  <tr key={category.id} className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
-                                      <td className="px-6 py-4 font-medium text-gray-900 dark:text-white">{category.id}</td>
-                                      <td className="px-6 py-4 font-medium text-gray-900 dark:text-white">{category.name}</td>
-                                      <td className="px-6 py-4">{category.description || '-'}</td>
-                                      <td className="px-6 py-4 text-center whitespace-nowrap space-x-2">
-                                          <Link to={`/categorias/edit/${category.id}`} className="text-green-600 hover:text-green-800 dark:text-green-400 dark:hover:text-green-300 inline-flex items-center p-1 hover:bg-green-100 dark:hover:bg-gray-700 rounded" title="Editar Categoría"> <FaEdit size="1.1em"/> </Link>
-                                          <button onClick={() => handleDeleteClick(category)} className="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 inline-flex items-center p-1 hover:bg-red-100 dark:hover:bg-gray-700 rounded" title="Eliminar Categoría"> <FaTrashAlt size="1.1em"/> </button>
-                                      </td>
-                                  </tr>
-                              ))
-                          ) : (
-                              <tr className="bg-white dark:bg-gray-800">
-                                  <td colSpan="4" className="text-center py-6 text-gray-500 dark:text-gray-400"> No se encontraron categorías.</td>
-                              </tr>
-                          )}
-                      </tbody>
-                  </table>
-              </div>
-          )}
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-2xl font-bold">Categorías</h1>
+        <Link to="/categorias/create" className="bg-blue-600 text-white px-4 py-2 rounded">
+          <FaPlus className="inline mr-2" /> Nueva Categoría
+        </Link>
       </div>
+
+      {error && <ErrorDisplay message={error} />}
+      {loading ? (
+        <LoadingSpinner />
+      ) : (
+        <table className="w-full border">
+          <thead className="bg-gray-100">
+            <tr>
+              <th>ID</th>
+              <th>Nombre</th>
+              <th>Descripción</th>
+              <th className="text-center">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            {categories.length ? (
+              categories.map(cat => (
+                <tr key={cat.id}>
+                  <td>{cat.id}</td>
+                  <td>{cat.name}</td>
+                  <td>{cat.description || '-'}</td>
+                  <td className="text-center space-x-2">
+                    <Link to={`/categorias/edit/${cat.id}`}><FaEdit /></Link>
+                    <button onClick={() => handleDeleteClick(cat)}><FaTrashAlt /></button>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr><td colSpan="4" className="text-center">No hay categorías.</td></tr>
+            )}
+          </tbody>
+        </table>
+      )}
+    </div>
   );
 }
 

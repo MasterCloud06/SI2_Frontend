@@ -1,7 +1,7 @@
 // src/pages/ventas/VentaDetail.jsx
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
 import { useParams } from 'react-router-dom';
+import api from '../../lib/axios';
 
 function VentaDetail() {
   const { ventaId } = useParams();
@@ -11,11 +11,10 @@ function VentaDetail() {
   useEffect(() => {
     const fetchVentaDetail = async () => {
       try {
-        const response = await axios.get(`http://localhost:8000/api/ventas/${ventaId}/`);
+        const response = await api.get(`/ventas/${ventaId}/`);
         setVenta(response.data);
       } catch (err) {
         setError('Error al cargar la venta');
-        console.error(err);
       }
     };
 
@@ -28,7 +27,7 @@ function VentaDetail() {
       {error && <div className="bg-red-200 text-red-800 p-2 mb-4">{error}</div>}
       {venta && (
         <div>
-          <p><strong>Total:</strong> ${venta.total}</p>
+          <p><strong>Total:</strong> Bs. {venta.total}</p>
           <p><strong>Estado:</strong> {venta.status}</p>
           <p><strong>Fecha de Creación:</strong> {new Date(venta.created_at).toLocaleString()}</p>
         </div>

@@ -1,3 +1,4 @@
+// src/pages/auth/Profile.jsx
 import React, { useEffect, useState } from 'react';
 
 function Profile() {
@@ -10,9 +11,7 @@ function Profile() {
     }
   }, []);
 
-  if (!user) {
-    return <div className="text-center mt-10">No estás autenticado.</div>;
-  }
+  if (!user) return <div className="text-center mt-10">No estás autenticado.</div>;
 
   return (
     <div className="p-6 max-w-lg mx-auto bg-white shadow-lg rounded-lg mt-6">

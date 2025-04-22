@@ -1,7 +1,7 @@
 // src/usuarios/UserDetail.jsx
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import axios from 'axios';
+import api from '../../lib/axios';
 
 function UserDetail() {
   const { userId } = useParams();
@@ -11,11 +11,10 @@ function UserDetail() {
   useEffect(() => {
     const fetchUserDetail = async () => {
       try {
-        const response = await axios.get(`http://localhost:8000/api/usuarios/${userId}/`);
+        const response = await api.get(`/usuarios/${userId}/`);
         setUser(response.data);
       } catch (err) {
         setError('Error al cargar el detalle del usuario');
-        console.error(err);
       }
     };
 
@@ -24,14 +23,14 @@ function UserDetail() {
 
   return (
     <div className="p-6">
-      <h1 className="text-3xl font-semibold text-gray-800 mb-6">Detalle del Usuario</h1>
-      {error && <div className="bg-red-200 text-red-800 p-2 mb-4">{error}</div>}
+      <h1 className="text-3xl font-semibold mb-4">Detalle del Usuario</h1>
+      {error && <div className="text-red-600">{error}</div>}
       {user && (
-        <div>
+        <div className="space-y-2">
           <p><strong>ID:</strong> {user.id}</p>
-          <p><strong>Nombre de Usuario:</strong> {user.username}</p>
-          <p><strong>Correo:</strong> {user.email}</p>
-          <p><strong>Rol:</strong> {user.role ? user.role.name : 'Sin rol'}</p>
+          <p><strong>Nombre:</strong> {user.username}</p>
+          <p><strong>Email:</strong> {user.email}</p>
+          <p><strong>Rol:</strong> {user.role?.name || 'Sin rol'}</p>
         </div>
       )}
     </div>

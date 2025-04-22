@@ -1,6 +1,6 @@
 // src/pages/reportes/ReporteCreate.jsx
 import React, { useState } from 'react';
-import axios from 'axios';
+import api from '../../lib/axios';
 
 function ReporteCreate() {
   const [titulo, setTitulo] = useState('');
@@ -12,16 +12,14 @@ function ReporteCreate() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post('http://localhost:8000/api/reportes/', {
+      await api.post('/reportes/', {
         titulo,
         descripcion,
         tipo_reporte: tipoReporte,
       });
       setMessage('Reporte creado exitosamente');
-      console.log(response.data);
     } catch (err) {
       setError('Error al crear el reporte');
-      console.error(err);
     }
   };
 
@@ -33,32 +31,15 @@ function ReporteCreate() {
       <form onSubmit={handleSubmit}>
         <div className="mb-4">
           <label htmlFor="titulo" className="block text-sm">Título</label>
-          <input
-            type="text"
-            id="titulo"
-            value={titulo}
-            onChange={(e) => setTitulo(e.target.value)}
-            required
-            className="w-full p-3 border rounded-md"
-          />
+          <input type="text" id="titulo" value={titulo} onChange={e => setTitulo(e.target.value)} required className="w-full p-3 border rounded-md" />
         </div>
         <div className="mb-4">
           <label htmlFor="descripcion" className="block text-sm">Descripción</label>
-          <textarea
-            id="descripcion"
-            value={descripcion}
-            onChange={(e) => setDescripcion(e.target.value)}
-            className="w-full p-3 border rounded-md"
-          />
+          <textarea id="descripcion" value={descripcion} onChange={e => setDescripcion(e.target.value)} className="w-full p-3 border rounded-md" />
         </div>
         <div className="mb-4">
           <label htmlFor="tipo_reporte" className="block text-sm">Tipo de Reporte</label>
-          <select
-            id="tipo_reporte"
-            value={tipoReporte}
-            onChange={(e) => setTipoReporte(e.target.value)}
-            className="w-full p-3 border rounded-md"
-          >
+          <select id="tipo_reporte" value={tipoReporte} onChange={e => setTipoReporte(e.target.value)} className="w-full p-3 border rounded-md">
             <option value="PDF">PDF</option>
             <option value="Excel">Excel</option>
           </select>

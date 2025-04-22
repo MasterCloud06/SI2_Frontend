@@ -1,6 +1,6 @@
 // src/pages/Carrito/Carrito.jsx
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../../lib/axios'; // ✅ Usamos axios centralizado
 import CarritoItem from './CarritoItem';
 import CarritoResumen from './CarritoResumen';
 
@@ -8,23 +8,26 @@ function Carrito() {
   const [productos, setProductos] = useState([]);
   const [total, setTotal] = useState(0);
 
-  const usuarioId = 1; // Puedes reemplazar esto con un valor dinámico si tienes auth
+  const usuarioId = 1; // 🔐 Reemplazar con ID dinámico del usuario autenticado (desde contexto o token)
 
   useEffect(() => {
-    axios.get(`http://localhost:8000/api/carrito/${usuarioId}/`)
-      .then(response => {
+    const fetchCarrito = async () => {
+      try {
+        const response = await api.get(`/carrito/${usuarioId}/`);
         const { items, total } = response.data;
         setProductos(items);
         setTotal(total);
-      })
-      .catch(error => {
+      } catch (error) {
         console.error('Error al cargar el carrito:', error);
-      });
+      }
+    };
+
+    fetchCarrito();
   }, []);
 
   const handleCheckout = () => {
-    // Redirigir a la página de pago
     console.log("Ir a pagar");
+    // Aquí podrías navegar a una ruta tipo: navigate("/checkout")
   };
 
   return (

@@ -1,6 +1,6 @@
 // src/usuarios/RoleManage.jsx
 import React, { useState } from 'react';
-import axios from 'axios';
+import api from '../../lib/axios';
 
 function RoleManage() {
   const [username, setUsername] = useState('');
@@ -11,14 +11,13 @@ function RoleManage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post('http://localhost:8000/api/update-role/', {
+      const response = await api.post('/update-role/', {
         username,
         role_name: roleName,
       });
       setMessage(response.data.detail);
     } catch (err) {
       setError('Error al actualizar el rol');
-      console.error(err);
     }
   };
 
@@ -30,23 +29,11 @@ function RoleManage() {
       <form onSubmit={handleSubmit}>
         <div className="mb-4">
           <label htmlFor="username" className="block text-sm">Nombre de Usuario</label>
-          <input
-            type="text"
-            id="username"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            required
-            className="w-full p-3 border rounded-md"
-          />
+          <input type="text" id="username" value={username} onChange={(e) => setUsername(e.target.value)} required className="w-full p-3 border rounded-md" />
         </div>
         <div className="mb-4">
           <label htmlFor="role_name" className="block text-sm">Nuevo Rol</label>
-          <select
-            id="role_name"
-            value={roleName}
-            onChange={(e) => setRoleName(e.target.value)}
-            className="w-full p-3 border rounded-md"
-          >
+          <select id="role_name" value={roleName} onChange={(e) => setRoleName(e.target.value)} className="w-full p-3 border rounded-md">
             <option value="cliente">Cliente</option>
             <option value="admin">Admin</option>
           </select>

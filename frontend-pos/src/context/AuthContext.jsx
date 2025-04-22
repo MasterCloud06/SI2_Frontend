@@ -5,28 +5,38 @@ const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
   const [loggedIn, setLoggedIn] = useState(false);
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState(() => {
+    const saved = localStorage.getItem('user');
+    return saved ? JSON.parse(saved) : null;
+  });
+  const [checking, setChecking] = useState(true); // Evita mostrar contenido antes de verificar sesión
 
-  // 1) Al montar, valida el token local
+  // Verifica sesión al montar
   const checkSession = async () => {
     const token = localStorage.getItem('access_token');
     if (!token) {
       setLoggedIn(false);
+      setChecking(false);
       return;
     }
     try {
       const res = await api.get('/auth/session/');
-      // si responde { authenticated: true, ... }
       if (res.data.authenticated) {
-        setUser({ username: res.data.username, id: res.data.id });
+        const sessionUser = {
+          username: res.data.username,
+          id: res.data.id,
+          ...res.data,
+        };
+        setUser(sessionUser);
         setLoggedIn(true);
       } else {
         throw new Error('No autenticado');
       }
     } catch {
       console.warn('⚠️ Token inválido o expirado');
-      setLoggedIn(false);
-      setUser(null);
+      logout(); // limpia todo si falla la sesión
+    } finally {
+      setChecking(false);
     }
   };
 
@@ -34,7 +44,7 @@ export function AuthProvider({ children }) {
     checkSession();
   }, []);
 
-  // 2) Login: llama al endpoint, guarda tokens y user
+  // Login
   const login = async (username, password) => {
     const res = await api.post('/auth/login/', { username, password });
     const { access, refresh, user: userData } = res.data;
@@ -45,19 +55,27 @@ export function AuthProvider({ children }) {
     setLoggedIn(true);
   };
 
-  // 3) Logout: limpia todo
+  // Logout
   const logout = async () => {
     try {
-      await api.post('/auth/logout/'); 
+      await api.post('/auth/logout/');
     } catch (err) {
       console.error('Error al cerrar sesión:', err);
     }
     localStorage.removeItem('access_token');
     localStorage.removeItem('refresh_token');
     localStorage.removeItem('user');
-    setLoggedIn(false);
     setUser(null);
+    setLoggedIn(false);
   };
+
+  if (checking) {
+    return (
+      <div className="w-full h-screen flex items-center justify-center text-gray-700 dark:text-white">
+        Validando sesión...
+      </div>
+    );
+  }
 
   return (
     <AuthContext.Provider value={{ loggedIn, user, login, logout }}>

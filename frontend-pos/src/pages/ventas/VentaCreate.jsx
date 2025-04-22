@@ -1,6 +1,6 @@
 // src/pages/ventas/VentaCreate.jsx
 import React, { useState } from 'react';
-import axios from 'axios';
+import api from '../../lib/axios'; // ✅ axios centralizado
 
 function VentaCreate() {
   const [total, setTotal] = useState('');
@@ -11,15 +11,11 @@ function VentaCreate() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post('http://localhost:8000/api/ventas/', {
-        total,
-        status,
-      });
+      const response = await api.post('/ventas/', { total, status });
       setMessage('Venta creada exitosamente');
       console.log(response.data);
     } catch (err) {
       setError('Error al crear la venta');
-      console.error(err);
     }
   };
 

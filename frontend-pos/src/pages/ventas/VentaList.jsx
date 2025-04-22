@@ -1,8 +1,7 @@
-
 // src/pages/ventas/VentaList.jsx
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
 import { Link } from 'react-router-dom';
+import api from '../../lib/axios';
 
 function VentaList() {
   const [ventas, setVentas] = useState([]);
@@ -11,11 +10,10 @@ function VentaList() {
   useEffect(() => {
     const fetchVentas = async () => {
       try {
-        const response = await axios.get('http://localhost:8000/api/ventas/');
+        const response = await api.get('/ventas/');
         setVentas(response.data);
       } catch (err) {
         setError('Error al cargar las ventas');
-        console.error(err);
       }
     };
 
@@ -40,7 +38,7 @@ function VentaList() {
           {ventas.map((venta) => (
             <tr key={venta.id}>
               <td className="px-4 py-2 border">{venta.id}</td>
-              <td className="px-4 py-2 border">${venta.total}</td>
+              <td className="px-4 py-2 border">Bs. {venta.total}</td>
               <td className="px-4 py-2 border">{venta.status}</td>
               <td className="px-4 py-2 border">{new Date(venta.created_at).toLocaleString()}</td>
               <td className="px-4 py-2 border">

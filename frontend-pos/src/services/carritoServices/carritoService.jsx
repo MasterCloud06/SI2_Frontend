@@ -1,10 +1,13 @@
 // src/services/carritoService.jsx
-import axios from 'axios';
+import api from '../lib/axios';
 
 export const getCarrito = (usuarioId) => {
-  return axios.get(`/api/carrito/${usuarioId}`);
+  return api.get(`/carrito/${usuarioId}/`);
 };
 
 export const agregarProducto = (usuarioId, productoId, cantidad) => {
-  return axios.post(`/api/carrito/${usuarioId}`, { producto_id: productoId, cantidad });
+  return api.post(`/carrito/${usuarioId}/`, {
+    producto_id: productoId,
+    cantidad,
+  });
 };
