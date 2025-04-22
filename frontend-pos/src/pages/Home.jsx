@@ -1,7 +1,7 @@
 // src/pages/Home.jsx
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import api from '../lib/axios'; // ✅ axios centralizado
+import api from '../lib/axios';
 import TailwindProductCard from '../components/common/TailwindProductCard.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
 
@@ -26,7 +26,7 @@ function Home() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const { loggedIn } = useAuth();
+  const { loggedIn, user } = useAuth();
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -66,12 +66,16 @@ function Home() {
               <a href="#pricing" className="hover:text-gray-300">Precios</a>
               <a href="#support" className="hover:text-gray-300">Soporte</a>
             </div>
-            {!loggedIn && (
-              <div className="flex space-x-4">
-                <Link to="/Login" className="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-500">Iniciar Sesión</Link>
-                <Link to="/Register" className="bg-green-600 text-white py-2 px-4 rounded hover:bg-green-500">Registrarse</Link>
-              </div>
-            )}
+            <div className="flex space-x-4">
+              {!loggedIn ? (
+                <>
+                  <Link to="/login" className="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-500">Iniciar Sesión</Link>
+                  <Link to="/register" className="bg-green-600 text-white py-2 px-4 rounded hover:bg-green-500">Registrarse</Link>
+                </>
+              ) : (
+                <span className="text-sm text-gray-300">Hola, {user?.username || 'Usuario'} 👋</span>
+              )}
+            </div>
           </div>
         </nav>
 
