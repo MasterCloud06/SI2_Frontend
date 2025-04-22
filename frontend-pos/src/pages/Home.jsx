@@ -1,9 +1,9 @@
-// src/pages/Home.jsx
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../lib/axios';
 import TailwindProductCard from '../components/common/TailwindProductCard.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
+import Sidebar from '../components/layout/Sidebar';
 
 // Imágenes
 import imgCafe from '../assets/images/cafe.jpg';
@@ -26,6 +26,7 @@ function Home() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const { loggedIn, user } = useAuth();
 
   useEffect(() => {
@@ -54,7 +55,8 @@ function Home() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gray-100 dark:bg-gray-900">
+    <div className="flex min-h-screen bg-gray-100 dark:bg-gray-900">
+      <Sidebar isCollapsed={isSidebarCollapsed} onToggleCollapse={setIsSidebarCollapsed} />
       <main className="flex-1 overflow-y-auto">
         {/* Navbar */}
         <nav className={`fixed top-0 left-0 right-0 bg-gray-800 text-white py-4 z-50 transition-shadow ${isScrolled ? 'shadow-md' : ''}`}>
