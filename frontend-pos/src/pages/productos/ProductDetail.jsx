@@ -38,6 +38,7 @@ function ProductDetail() {
       setProduct(response.data);
       setActionMessage(`Stock reducido exitosamente. Nuevo stock: ${response.data.stock}`);
       setReduceAmount(1);
+      setActionError('');
     } catch (err) {
       setActionError(err.response?.data?.detail || 'Error al reducir stock.');
     }
